@@ -27,6 +27,14 @@ const envSchema = z.object({
     .default("refresh_token"),
 
   REFRESH_PATH: z.string().min(1).max(128).default("/refresh"),
+  APP_ORIGIN: z.string().url().default("http://localhost:3000"),
+  REDIS_URL: z.string().url().default("redis://localhost:6379"),
+
+  MAIL_TRAP_API_KEY: z.string().min(1),
+  MAIL_SENDER_EMAIL: z.string().email(),
+  MAIL_SENDER_NAME: z.string().min(1),
+  MAIL_TRAP_ACCOUNT_ID: z.string().min(1),
+  AUTH_ISSUER: z.string().min(1),
 });
 
 const parsedEnv = envSchema.parse(process.env);

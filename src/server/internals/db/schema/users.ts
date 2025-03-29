@@ -18,17 +18,18 @@ export const users = pgTable("users", {
   last_name: varchar("last_name", { length: 255 }).notNull(),
   email: varchar("email", { length: 255 }).notNull().unique(),
   is_active: boolean("is_active").notNull().default(true),
-  password: varchar("password", { length: 255 }).notNull(),
-  avatar_url: varchar("avatar_url", { length: 255 }).notNull(),
+  password_hash: varchar("password_hash", { length: 255 }),
+  password_salt: varchar("password_salt", { length: 255 }),
+  avatar_url: varchar("avatar_url", { length: 255 }),
   email_verified_at: timestamp("email_verified_at", {
     mode: "date",
     withTimezone: true,
-  }).notNull(),
+  }),
 
   last_login_at: timestamp("last_login_at", {
     mode: "date",
     withTimezone: true,
-  }).notNull(),
+  }),
   ...docTimestamps,
 });
 

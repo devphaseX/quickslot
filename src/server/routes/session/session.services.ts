@@ -138,3 +138,13 @@ export const deleteSession = async (sessionId: string, userId: string) => {
 
   return !!deletedSession;
 };
+
+export const createSession = async (
+  data: Pick<Session, "ip" | "user_id" | "user_agent" | "expires_at">,
+) => {
+  const [session] = await db
+    .insert(sessions)
+    .values({ ...data, version: 1 })
+    .returning();
+  return session;
+};
