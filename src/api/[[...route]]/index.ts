@@ -1,5 +1,8 @@
-import app from "@/server";
-import { handle } from "hono/vercel";
+import { httpHandler } from "@/server";
 
-const handler = handle(app);
-export { handler as POST, handler as GET, handler as PUT, handler as DELETE };
+export {
+  httpHandler as POST,
+  httpHandler as GET,
+  httpHandler as PUT,
+  httpHandler as DELETE,
+};

@@ -13,6 +13,7 @@
     "@keyv/redis": "^4.3.2",
     "@oslojs/crypto": "^1.0.1",
     "@oslojs/encoding": "^1.1.0",
+    "bullmq": "^5.45.0",
     "cache-manager": "^6.4.1",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
