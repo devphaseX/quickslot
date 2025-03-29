@@ -54,6 +54,10 @@ import { createDate, TimeSpan } from "oslo";
 import { auth, authMiddleware } from "@/server/internals/auth/auth";
 import { Session } from "@/server/internals/db/schema";
 import { AppEnv } from "@/server/internals/types/appenv";
+import {
+  sendEmailJob,
+  TemplateType,
+} from "@/server/async_tasks/send_email_job/send_email_job_queue";
 
 const app = new Hono<AppEnv>();
 
@@ -93,6 +97,23 @@ app.post(
         email: payload.email,
       }),
     );
+
+    await sendEmailJob({
+      to: [
+        {
+          email: newUser.email,
+          name: `${newUser.first_name} ${newUser.last_name}`,
+        },
+      ],
+
+      subject: "Verify your email",
+      template: TemplateType.VERIFY_USER_EMAIL,
+      data: {
+        email: newUser.email,
+        name: `${newUser.first_name} ${newUser.last_name}`,
+        token,
+      },
+    });
 
     return successResponse(
       c,
@@ -141,6 +162,43 @@ app.post(
         status_code: StatusCodes.NOT_FOUND,
         error_code: ResponseErrorCode.AUTH_USER_NOT_FOUND,
       });
+    }
+
+    if (!user.email_verified_at) {
+      const token = await tokenCache.createToken(
+        user.id,
+        user.email,
+        TokenType.VERIFY_EMAIL,
+        JSON.stringify({
+          email: user.email,
+        }),
+      );
+
+      await sendEmailJob({
+        to: [
+          {
+            email: user.email,
+            name: `${user.first_name} ${user.last_name}`,
+          },
+        ],
+
+        subject: "Verify your email",
+        template: TemplateType.VERIFY_USER_EMAIL,
+        data: {
+          email: user.email,
+          name: `${user.first_name} ${user.last_name}`,
+          token,
+        },
+      });
+
+      return errorResponse(
+        c,
+        "Please verify your email address.  We've sent a verification link to your email address.",
+        {
+          status_code: StatusCodes.FORBIDDEN,
+          error_code: ResponseErrorCode.AUTH_USER_NOT_VERIFIED,
+        },
+      );
     }
 
     const session = await createSession({
