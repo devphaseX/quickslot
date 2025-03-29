@@ -369,6 +369,23 @@ app.post(
       new TimeSpan(1, "d").seconds(),
     );
 
+    await sendEmailJob({
+      to: [
+        {
+          email: user.email,
+          name: `${user.first_name} ${user.last_name}`,
+        },
+      ],
+
+      subject: "Forgot Password",
+      template: TemplateType.VERIFY_FORGOT_PASSWORD,
+      data: {
+        email: user.email,
+        name: `${user.first_name} ${user.last_name}`,
+        token,
+      },
+    });
+
     return successResponse(
       c,
       undefined,
